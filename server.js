@@ -7,6 +7,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
 const weather = require('./modules/weather');
+const verifyUser = require('./auth');
+const User = require('./modules/user');
+
 
 mongoose.connect(process.env.DB_URL);
 app.use(cors());
@@ -25,7 +28,23 @@ app.get('/', (request, response) => {
   response.send('Hello this works!');
 });
 
+app.get('/test', (req, res) => {
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      res.send('test request received');
+    }
+  });
+});
+
 app.get('/weather', weatherHandler);
+
+app.get('/profile', getProfile);
+app.post('/profile', postProfile);
+// app.put('/profile/:id', putProfile);
+app.delete('/profile/:id', deleteProfile);
 
 app.get('*', (request, response) => {
   response.send('Not sure what you are looking for. but it doesn\'t exist.');
@@ -40,6 +59,81 @@ function weatherHandler(request, response) {
       response.status(500).send('Sorry. Something went wrong!');
     });
 }
+
+async function getProfile(req, res, next) {
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      try {
+        let queryObject = {};
+        if (req.query.name) {
+          queryObject.name = req.query.name;
+          console.log(queryObject);
+        }
+        let results = await User.find(queryObject);
+        console.log(results);
+        res.status(200).send(results);
+      } catch (error) {
+        next(error);
+      }
+    }
+  });
+}
+
+async function postProfile(req, res, next) {
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      try {
+        console.log(req.body);
+        let newUser = await User.create(req.body);
+        res.status(200).send(newUser);
+      } catch (error) {
+        next(error);
+      }
+    }
+  });
+}
+
+// async function putProfile(req, res, next) {
+//   verifyUser(req, async (err) => {
+//     if (err) {
+//       console.error(err);
+//       res.send('invalid token');
+//     } else {
+//       try {
+//         let id = req.params.id;
+//         let updatedUser = await User.findByIdAndUpdate(id, req.body, {new: true, overwrite: true});
+//         res.status(200).send(updatedUser);
+//       } catch (error) {
+//         next(error);
+//       }
+//     }
+//   });
+// }
+
+async function deleteProfile(req, res, next) {
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      try {
+        let id = req.params.id;
+        await User.findByIdAndDelete(id);
+        res.send('User Deleted');
+      } catch (error) {
+        next(error);
+      }
+    }
+  });
+}
+
+
 
 app.use((error, request, response, next) => {
   response.status(500).send(error.message);
