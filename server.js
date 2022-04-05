@@ -7,7 +7,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
 const weather = require('./modules/weather');
-const weatherCityName = require('./modules/weatherCityName')
+const weatherCityName = require('./modules/weatherCityName');
 const verifyUser = require('./auth');
 const User = require('./modules/user');
 
@@ -148,7 +148,7 @@ async function deleteProfile(req, res, next) {
 
 
 app.use((error, request, response, next) => {
-  response.status(500).send(error.message);
+  next(error);
 });
 
 
