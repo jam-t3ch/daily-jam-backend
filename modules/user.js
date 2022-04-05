@@ -6,7 +6,6 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema({
   user: { type: String, required: true },
-  note: { type: String, required: true },
   loc: { type: String, required: true }
 });
 
