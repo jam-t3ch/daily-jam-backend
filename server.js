@@ -7,6 +7,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
 const weather = require('./modules/weather');
+const weatherCityName = require('./modules/weatherCityName')
 const verifyUser = require('./auth');
 const User = require('./modules/user');
 
@@ -40,6 +41,7 @@ app.get('/test', (req, res) => {
 });
 
 app.get('/weather', weatherHandler);
+app.get('/weatherCity', weatherCityHandler);
 
 app.get('/profile', getProfile);
 app.post('/profile', postProfile);
@@ -53,6 +55,16 @@ app.get('*', (request, response) => {
 function weatherHandler(request, response) {
   const { lat, lon } = request.query;
   weather(lat, lon)
+    .then(summaries => response.send(summaries))
+    .catch((error) => {
+      console.error(error);
+      response.status(500).send('Sorry. Something went wrong!');
+    });
+}
+
+function weatherCityHandler(request, response) {
+  const cityName = request.query.cityName;
+  weatherCityName(cityName)
     .then(summaries => response.send(summaries))
     .catch((error) => {
       console.error(error);
