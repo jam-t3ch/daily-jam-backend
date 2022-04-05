@@ -99,22 +99,22 @@ async function postProfile(req, res, next) {
   });
 }
 
-async function putProfile(req, res, next) {
-  verifyUser(req, async (err) => {
-    if (err) {
-      console.error(err);
-      res.send('invalid token');
-    } else {
-      try {
-        let id = req.params.id;
-        let updatedUser = await User.findByIdAndUpdate(id, req.body, {new: true, overwrite: true});
-        res.status(200).send(updatedUser);
-      } catch (error) {
-        next(error);
-      }
-    }
-  });
-}
+// async function putProfile(req, res, next) {
+//   verifyUser(req, async (err) => {
+//     if (err) {
+//       console.error(err);
+//       res.send('invalid token');
+//     } else {
+//       try {
+//         let id = req.params.id;
+//         let updatedUser = await User.findByIdAndUpdate(id, req.body, {new: true, overwrite: true});
+//         res.status(200).send(updatedUser);
+//       } catch (error) {
+//         next(error);
+//       }
+//     }
+//   });
+// }
 
 async function deleteProfile(req, res, next) {
   verifyUser(req, async (err) => {
