@@ -10,6 +10,6 @@ const NoteSchema = new Schema({
   user: { type: String, required: true }
 });
 
-const NoteModel = mongoose.model('user', NoteSchema);
+const NoteModel = mongoose.model('note', NoteSchema);
 
 module.exports = NoteModel;
