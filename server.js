@@ -10,6 +10,7 @@ const weather = require('./modules/weather');
 const weatherCityName = require('./modules/weatherCityName');
 const verifyUser = require('./auth');
 const User = require('./modules/user');
+const notes = require('./modules/notes');
 
 
 mongoose.connect(process.env.DB_URL);
@@ -45,8 +46,13 @@ app.get('/weatherCity', weatherCityHandler);
 
 app.get('/profile', getProfile);
 app.post('/profile', postProfile);
-// app.put('/profile/:id', putProfile);
+app.put('/profile/:id', putProfile);
 app.delete('/profile/:id', deleteProfile);
+
+app.get('/notes', getNotes);
+app.post('/notes', postNotes);
+app.put('/notes/:id', putNotes);
+app.delete('/notes/:id', deleteNotes);
 
 app.get('*', (request, response) => {
   response.send('Not sure what you are looking for. but it doesn\'t exist.');
@@ -111,22 +117,22 @@ async function postProfile(req, res, next) {
   });
 }
 
-// async function putProfile(req, res, next) {
-//   verifyUser(req, async (err) => {
-//     if (err) {
-//       console.error(err);
-//       res.send('invalid token');
-//     } else {
-//       try {
-//         let id = req.params.id;
-//         let updatedUser = await User.findByIdAndUpdate(id, req.body, {new: true, overwrite: true});
-//         res.status(200).send(updatedUser);
-//       } catch (error) {
-//         next(error);
-//       }
-//     }
-//   });
-// }
+async function putProfile(req, res, next) {
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      try {
+        let id = req.params.id;
+        let updatedUser = await User.findByIdAndUpdate(id, req.body, {new: true, overwrite: true});
+        res.status(200).send(updatedUser);
+      } catch (error) {
+        next(error);
+      }
+    }
+  });
+}
 
 async function deleteProfile(req, res, next) {
   verifyUser(req, async (err) => {
@@ -145,7 +151,78 @@ async function deleteProfile(req, res, next) {
   });
 }
 
+async function getNotes(req,res,next){
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      try {
+        let queryObject = {};
+        if (req.query.name) {
+          queryObject.name = req.query.name;
+          console.log(queryObject);
+        }
+        let results = await notes.find(queryObject);
+        console.log(results);
+        res.status(200).send(results);
+      } catch (error) {
+        next(error);
+      }
+    }
+  });
+}
 
+async function postNotes(req,res,next){
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      try {
+        console.log(req.body);
+        let newUser = await notes.create(req.body);
+        res.status(200).send(newUser);
+      } catch (error) {
+        next(error);
+      }
+    }
+  });
+}
+
+async function putNotes(req,res,next){
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      try {
+        let id = req.params.id;
+        let updatedNotes = await notes.findByIdAndUpdate(id, req.body, {new: true, overwrite: true});
+        res.status(200).send(updatedNotes);
+      } catch (error) {
+        next(error);
+      }
+    }
+  });
+}
+
+async function deleteNotes(req,res,next){
+  verifyUser(req, async (err) => {
+    if (err) {
+      console.error(err);
+      res.send('invalid token');
+    } else {
+      try {
+        let id = req.params.id;
+        await notes.findByIdAndDelete(id);
+        res.send('Note Deleted');
+      } catch (error) {
+        next(error);
+      }
+    }
+  });
+}
 
 app.use((error, request, response, next) => {
   next(error);
