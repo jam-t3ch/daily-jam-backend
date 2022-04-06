@@ -88,10 +88,10 @@ async function getProfile(req, res, next) {
         let queryObject = {};
         if (req.query.name) {
           queryObject.name = req.query.name;
-          console.log(queryObject);
+          // console.log(queryObject);
         }
         let results = await User.find(queryObject);
-        console.log(results);
+        // console.log(results);
         res.status(200).send(results);
       } catch (error) {
         next(error);
@@ -159,12 +159,12 @@ async function getNotes(req,res,next){
     } else {
       try {
         let queryObject = {};
-        if (req.query.name) {
-          queryObject.name = req.query.name;
-          console.log(queryObject);
+        // console.log(`params: ${req.query.email}`);
+        if (req.params) {
+          queryObject.user = req.query.email;
         }
         let results = await notes.find(queryObject);
-        console.log(results);
+        // console.log(results);
         res.status(200).send(results);
       } catch (error) {
         next(error);
