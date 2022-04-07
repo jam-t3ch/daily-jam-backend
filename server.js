@@ -216,6 +216,7 @@ async function deleteNotes(req,res,next){
       try {
         let id = req.params.id;
         await notes.findByIdAndDelete(id);
+        console.log('Note Deleted');
         res.send('Note Deleted');
       } catch (error) {
         next(error);
