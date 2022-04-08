@@ -29,10 +29,25 @@ function parseWeather(weatherData) {
   }
 }
 
+let monthArr = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function fToC(celsius) {
+  return (celsius * (9 / 5)) + 32;
+}
+
+let weekdayArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 class Forecast {
   constructor(cityObject) {
-    this.date = cityObject.valid_date;
-    this.description = `Low of ${cityObject.min_temp}°C and a High of ${cityObject.max_temp}°C with ${cityObject.weather.description}`;
+    this.dayNum = cityObject.valid_date.slice(8, 10);
+    this.month = monthArr[cityObject.valid_date.slice(6, 7)];
+    this.year = cityObject.valid_date.slice(0, 4);
+    this.high = Math.floor(fToC(cityObject.max_temp)).toString();
+    this.low = Math.floor(fToC(cityObject.min_temp)).toString();
+    this.condition = cityObject.weather.description;
+    let dayindex = new Date(`${this.month} ${this.dayNum}, ${this.year} 23:15:30`);
+    this.dayofweek = weekdayArr[dayindex.getDay()];
+    this.imgsrc = this.condition.split(' ')[0];
   }
 }
 
