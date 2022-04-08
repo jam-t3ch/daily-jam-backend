@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const app = express();
 const weather = require('./modules/weather');
 const weatherCityName = require('./modules/weatherCityName');
+const news = require('./modules/news');
 const verifyUser = require('./auth');
 const User = require('./modules/user');
 const notes = require('./modules/notes');
@@ -53,6 +54,8 @@ app.get('/notes', getNotes);
 app.post('/notes', postNotes);
 app.put('/notes/:id', putNotes);
 app.delete('/notes/:id', deleteNotes);
+
+app.get('/news', getNews);
 
 app.get('*', (request, response) => {
   response.send('Not sure what you are looking for. but it doesn\'t exist.');
@@ -125,7 +128,7 @@ async function putProfile(req, res, next) {
     } else {
       try {
         let id = req.params.id;
-        let updatedUser = await User.findByIdAndUpdate(id, req.body, {new: true, overwrite: true});
+        let updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true, overwrite: true });
         res.status(200).send(updatedUser);
       } catch (error) {
         next(error);
@@ -151,7 +154,7 @@ async function deleteProfile(req, res, next) {
   });
 }
 
-async function getNotes(req,res,next){
+async function getNotes(req, res, next) {
   verifyUser(req, async (err) => {
     if (err) {
       console.error(err);
@@ -173,7 +176,7 @@ async function getNotes(req,res,next){
   });
 }
 
-async function postNotes(req,res,next){
+async function postNotes(req, res, next) {
   verifyUser(req, async (err) => {
     if (err) {
       console.error(err);
@@ -190,7 +193,7 @@ async function postNotes(req,res,next){
   });
 }
 
-async function putNotes(req,res,next){
+async function putNotes(req, res, next) {
   verifyUser(req, async (err) => {
     if (err) {
       console.error(err);
@@ -198,7 +201,7 @@ async function putNotes(req,res,next){
     } else {
       try {
         let id = req.params.id;
-        let updatedNotes = await notes.findByIdAndUpdate(id, req.body, {new: true, overwrite: true});
+        let updatedNotes = await notes.findByIdAndUpdate(id, req.body, { new: true, overwrite: true });
         res.status(200).send(updatedNotes);
       } catch (error) {
         next(error);
@@ -207,7 +210,7 @@ async function putNotes(req,res,next){
   });
 }
 
-async function deleteNotes(req,res,next){
+async function deleteNotes(req, res, next) {
   verifyUser(req, async (err) => {
     if (err) {
       console.error(err);
@@ -223,6 +226,18 @@ async function deleteNotes(req,res,next){
       }
     }
   });
+}
+
+async function getNews(req, res) {
+  const search = req.query.search;
+  const locale = req.query.locale;
+  // console.log('Search', search, 'locale', locale);
+  news(search, locale)
+    .then(summaries => res.send(summaries))
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Sorry. Something went wrong!');
+    });
 }
 
 app.use((error, request, response, next) => {
